@@ -1,31 +1,37 @@
-document.getElementById('registrationForm').addEventListener('submit', async function (event) {
-    event.preventDefault();
 
-    const username = document.getElementById('username').value;
-    const nome = document.getElementById('nome').value;
-    const cognome = document.getElementById('cognome').value;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const errorElement = document.getElementById('registrationError');
+import {data} from "./index"
 
-    try {
-        const response = await fetch('http://localhost:3001/auth/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ ragioneSociale, nome, cognome, email, password })
+const form = document.getElementById('createClienteForm');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+            const clientePayload = Object.fromEntries(formData.entries());
+
+            clientePayload.dataUltimoContatto = new Date(clientePayload.dataUltimoContatto).toISOString().split('T')[0];
+
+            clientePayload.sede = []; 
+
+            try {
+                const response = await fetch('http://localhost:3001/me/clienti', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization' : 'Baerer {data}'
+                    },
+                    body: JSON.stringify(clientePayload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    alert('Errore durante la creazione del cliente: ' + errorData.message);
+                } else {
+                    const createdCliente = await response.json();
+                    alert('Cliente creato con successo: ' + JSON.stringify(createdCliente, null, 2));
+                }
+            } catch (error) {
+                console.error('Errore durante la fetch:', error);
+                alert('Si è verificato un errore: ' + error.message);
+            }
         });
-
-        if (response.ok) {
-            alert('Registrazione avvenuta con successo! Effettua il login.');
-            window.location.href = 'index.html';
-        } else {
-            const data = await response.json();
-            errorElement.textContent = data.message || 'Errore durante la registrazione';
-        }
-    } catch (error) {
-        console.error('Errore di rete:', error);
-        errorElement.textContent = 'Errore di rete. Riprova più tardi.';
-    }
-});
