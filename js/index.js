@@ -15,8 +15,9 @@ document.getElementById('loginForm').addEventListener('submit', async function (
 
         if (response.ok) {
             const data = await response.json();
+            console.log(data)
             localStorage.setItem('token', data.token);
-            window.location.href = 'dashboard.html';
+            // window.location.href = 'dashboard.html';
         } else {
             document.getElementById('message').textContent = 'Email o password non validi!';
         }
