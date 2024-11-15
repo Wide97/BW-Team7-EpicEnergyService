@@ -1,5 +1,10 @@
+import jwt_decode from '/jwt-decode';
+
+
 document.getElementById('loginForm').addEventListener('submit', async function (event) {
     event.preventDefault();
+
+ 
 
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -15,9 +20,17 @@ document.getElementById('loginForm').addEventListener('submit', async function (
 
         if (response.ok) {
             const data = await response.json();
-            console.log(data)
+            const token = data.token;
+            const decoded = jwt_decode(token);
+            const tipologiaUtente = decoded.tipologiaUtente;
+            console.log(decoded);
+            console.log(tipologiaUtente);
             localStorage.setItem('token', data.token);
-            window.location.href = 'dashboard.html';
+            if(tipologiaUtente === "ADMIN"){
+                window.location.href = 'dashboardAdmin.html';
+            } else {
+                window.location.href = 'dashboard.html';
+            }
         } else {
             document.getElementById('message').textContent = 'Email o password non validi!';
         }
